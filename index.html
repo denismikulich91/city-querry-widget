@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
+
+    <head>
+        <title>Search with Query Builder</title>
+        <meta name="author" content="MCN8" />
+        <meta name="description" content="Search with Query Builder" />
+        <meta name="keywords" content="widget, search, query" />
+        <meta name="apiVersion" content="0.1" />
+        <meta name="debugMode" content="true" />
+        <meta name="strictMode" content="false" />
+        <meta name="autoRefresh" content="0" />
+
+        <!-- Application Standalone emulation files -->
+        <link rel="stylesheet" type="text/css" href="http://uwa.netvibes.com/lib/c/UWA/assets/css/standalone.css" />
+        <script type="text/javascript" src="http://uwa.netvibes.com/lib/c/UWA/js/UWA_Standalone_Alone.js"></script>
+
+        <!-- External JS Scripts -->
+        <script type="text/javascript" src="../assets/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+        <script type="text/javascript" src="../assets/libs/jquery-1.11.1.js"></script>
+
+        <!-- Polymer import -->
+        <link rel="import" href="../assets/bower_components/polymer/polymer.html">
+        <link rel="import" href="elements/main-element.html">
+
+        <!-- Application Preferences -->
+        <widget:preferences>
+            <widget:preference type="boolean" name="enableDeleteDataset" label="Enable Delete Dataset" defaultValue='false'></widget:preference>
+        </widget:preferences>
+
+        <style>
+            table {
+                width: 100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main-element></main-element>
+    </body>
+
+</html>

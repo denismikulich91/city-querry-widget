@@ -1,0 +1,251 @@
+<link rel="import" href="../../assets/bower_components/polymer/polymer.html">
+<link rel="import" href="../../assets/bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../assets/bower_components/iron-icons/device-icons.html">
+<link rel="import" href="../../assets/bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../assets/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../assets/bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../assets/bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../assets/bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../assets/bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../assets/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../assets/bower_components/paper-tags/paper-tags-input.html">
+<link rel="import" href="../../assets/bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../assets/bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../assets/bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../assets/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../assets/bower_components/vaadin-grid/vaadin-grid-sorter.html">
+<link rel="import" href="../../assets/bower_components/vaadin-grid/vaadin-grid-filter.html">
+<link rel="import" href="../../assets/bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../assets/images/citysearch-icons.html">
+<link rel="import" href="styles/main-element-style.html">
+<dom-module id="main-element">
+    <template>
+        <style include="main-element-style"></style>
+        <div id='loading'><img src='../../assets/images/loader.gif' title='Loading...' alt='Loading...' /></div>
+            <div id='content'>
+				<paper-dialog id="actions" on-iron-overlay-closed="dialogColsed">
+					<h2>Remove Dataset</h2>	
+					<p>Are you sure you want to permanently remove this dataset from refrential?</p>					
+					<div class="buttons">
+						<paper-button dialog-dismiss on-click="handleDeleteDataset" class="button redButton">Yes</paper-button>
+						<paper-button dialog-confirm on-click="handleDeleteDataset" class="button" autofocus>No</paper-button>
+					</div>
+				</paper-dialog>
+                <div id='toolbar'>
+                    <paper-icon-button id="searchTypeToggle" dialog-confirm icon="maps:layers" on-click="toggleSearchType"></paper-icon-button>
+                    <paper-tooltip for="searchTypeToggle">Search Dataset</paper-tooltip>
+                    <div class="divider"></div>
+                    <paper-icon-button id="advanceSearchToggle" dialog-confirm icon="icons:list" on-click="toggleAdvanceSearch"></paper-icon-button>
+                    <paper-tooltip for="advanceSearchToggle">Advanced Search</paper-tooltip>
+                </div>
+                <table>
+                    <tr>
+                        <td>
+                            <!-- <paper-input id="whatInput" label="What" always-float-label value="lamp"></paper-input> -->
+                            <paper-tags-input id="whatInput" label="What" always-float-label delimiter=";" on-input="setWhatTag" on-tag-removed="processWhatTagRemoved" on-tag-added="processWhatTagAdded" on-tag-selected="processSelectedWhatTag"></paper-tags-input>
+                        </td>
+                        <td id="advanceSearchOperators" class="btnCol">
+                            <paper-button class="attributeOperator" on-click="addAttributeJoinOperator" hidden="[[searchDataset]]">AND</paper-button>
+                            <paper-button class="attributeOperator" on-click="addAttributeJoinOperator" hidden="[[searchDataset]]">OR</paper-button>
+                            <!-- <paper-button class="attributeOperator" on-click="addAttributeJoinOperator" hidden="[[searchDataset]]">(</paper-button> -->
+                            <!-- <paper-button class="attributeOperator" on-click="addAttributeJoinOperator" hidden="[[searchDataset]]">)</paper-button> -->
+                        </td>
+                    </tr>
+                    <tr id="addAttributeFilterDialog" class="dropdown">
+                        <td colspan="5">
+                            <div id="attributeFilterInputs">
+                                <select id="attributeFilterJoin" value="{{attributeFilter.selectedJoinOperator}}">
+                                    <option>AND</option>
+                                    <option>OR</option>
+                                    <!-- <option>(</option> -->
+                                    <!-- <option>)</option> -->
+                                </select>
+                                <span>{{attributeFilter.attribute}}</span>
+                                <input type="hidden" id="attributeFilterField" value="{{attributeFilter.key}}">
+                                <select id="attributeFilterOperator" value="{{attributeFilter.selectedFilterOperator}}">
+                                    <template is="dom-repeat" items="{{attributeFilter.operators}}">
+                                        <option>{{item}}</option>
+                                    </template>
+                                </select>
+                                <div>
+                                    <paper-input id="attributeFilterValue" label="Value" no-label-float value="{{attributeFilter.value}}" on-focused-changed="showAttributeValueSuggestions"></paper-input>
+                                    <paper-listbox id="attributeFilterValuesList" attr-for-selected="item-name" on-selected-item-changed="setAttributeFilterValue">
+                                        <template is="dom-repeat" items="{{attributeFilterValues}}">
+                                            <paper-item item-name="{{item}}">{{item}}</paper-item>
+                                        </template>
+                                    </paper-listbox>
+                                </div>
+                            </div>
+                            <!-- <span>{{attributeFilter.key}}</span> -->
+                            <br />
+                            <paper-button id="updateAttributeFilterBtn" on-click="updateAttributeFilter">Update</paper-button>
+                            <paper-button id="addAttributeFilterBtn" on-click="addAttributeFilter">Add</paper-button>
+                            <paper-button on-click="cancelAddAttributeFilter">Cancel</paper-button>
+                            <br />
+                            <br />
+                        </td>
+                    </tr>
+                    <tr hidden="[[searchDataset]]">
+                        <td>
+                            <paper-input id="searchRadiusInput" label="Radius (m)" always-float-label placeholder="Search radius in meters" value="100" auto-validate allowed-pattern="[0-9]" on-input="processUpdateSearchRadius"></paper-input>
+                            <paper-tooltip for="searchRadiusInput">Set radius for new where feature or select existing where feature to update buffer radius</paper-tooltip>
+                        </td>
+                    </tr>
+                    <tr hidden="[[searchDataset]]">
+                        <td>
+                            <!-- <paper-input id="whereInput" label="Where" always-float-label on-input="whereInputChanged"></paper-input> -->
+                            <paper-tags-input id="whereInput" label="Where" always-float-label delimiter=";" on-tag-removed="processWhereInputRemoved" on-input="whereInputChanged" on-tag-selected="processSelectedWhereTag"></paper-tags-input>
+                            <paper-tooltip for="whereInput">Search for feature within buffered areas</paper-tooltip>
+                        </td>
+                        <td class="btnCol">
+                            <paper-icon-button id="addSelectedFeatureBtn" dialog-confirm icon="icons:add-circle-outline" on-click="addSelectedFeatureToWhere"></paper-icon-button>
+                            <paper-tooltip for="addSelectedFeatureBtn">Select City Feature</paper-tooltip>
+                            <paper-icon-button id="setPointBtn" dialog-confirm icon="maps:place" on-click="toggleSetPoint"></paper-icon-button>
+                            <paper-tooltip for="setPointBtn">Create Point</paper-tooltip>
+                            <paper-icon-button id="setLineBtn" dialog-confirm icon="icons:timeline" on-click="toggleDrawLine"></paper-icon-button>
+                            <paper-tooltip for="setLineBtn">Create Line</paper-tooltip>
+                            <paper-icon-button id="setPolygonBtn" dialog-confirm icon="device:signal-cellular-null" on-click="toggleDrawPolygon"></paper-icon-button>
+                            <paper-tooltip for="setPolygonBtn">Create Area</paper-tooltip>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>{{toolMsg}}</b></td>
+                    </tr>
+                    <tr id="suggestions" class="dropdown">
+                        <td colspan="5">
+                            <img id="suggestionsSpinner" src="../../assets/images/loader.gif" title="Loading..." alt="Loading...">
+                            <vaadin-grid id="suggestDatagrid" items="[[suggestResults]]" multi-sort="[[multiSort]]" active-item="{{suggestActiveItem}}">
+                                <template class="row-details">
+                                    <div class="details">
+                                        <table>
+                                            <template is="dom-repeat" items="{{toArray(item)}}">
+                                                <tr>
+                                                    <td>{{item.name}}</td>
+                                                    <td>{{item.value}}</td>
+                                                </tr>
+                                            </template>
+                                        </table>
+                                    </div>
+                                </template>
+                                <vaadin-grid-column width="35px" flex-grow="0">
+                                    <template>
+                                        <iron-icon icon="{{getGeoTypeIcon(item.geometrytype.value)}}"></iron-icon>
+                                    </template>
+                                </vaadin-grid-column>
+                                <vaadin-grid-column resizable>
+                                    <template>{{getFeatureName(item)}}</template>
+                                </vaadin-grid-column>
+                            </vaadin-grid>
+                            <br />
+                            <paper-button on-click="setWhereWithSuggest">Ok</paper-button>
+                            <paper-button on-click="unsetWhereWithSuggest">Cancel</paper-button>
+                            <br />
+                            <br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <paper-button id="searchBtn" on-click="newSearch">Search</paper-button>
+                            <paper-button id="clearBtn" on-click="clear">Clear</paper-button>
+                        </td>
+                        <td>
+                            <div id="exportBtnRelativeContainer" hidden="[[searchDataset]]">
+                                <div id="exportBtnContainer">
+                                    <paper-button id="exportBtn" on-click="showExportOptions" on-focused-changed="showExportOptions">
+                                        Export
+                                        <iron-icon id="exportDropdownIcon" class="white" icon="icons:arrow-drop-down"></iron-icon>
+                                        <iron-icon id="exportSpinner" src="../assets/images/loader.gif"></iron-icon>
+                                    </paper-button>
+                                    <paper-listbox id="exportOptionsList" class="dropdown" on-iron-select="export">
+                                        <paper-item value="xls">XLS</paper-item>
+                                        <paper-item value="kml">KML</paper-item>
+                                    </paper-listbox>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div id="searchSummary">Search results <b>[[searchSummary.start]] - [[searchSummary.end]]</b> of <b>[[searchSummary.total]]</b></div>
+                <img id="searchingSpinner" src="../../assets/images/loader.gif" title="Loading..." alt="Loading...">
+                <vaadin-grid id="resultsDatagrid" items="[[displayedResults]]" multi-sort="[[multiSort]]" active-item="{{activeItem}}">
+                    <template class="row-details">
+                        <div class="details">
+                            <table id="detailsTable">
+                                <template is="dom-repeat" items="{{toArray(item)}}">
+                                    <tr>
+                                        <td>
+                                            <paper-icon-button class="addAttributeBtn" icon="icons:add-circle-outline" on-click="openAttributeFilterDialog" data-name="[[item.name]]" data-key="[[item.key]]" data-value="[[item.value]]" hidden="[[item.disableAttributeFilter]]"></paper-icon-button>
+                                        </td>
+                                        <td>[[item.name]]</td>
+                                        <td inner-h-t-m-l="[[item.value]]"></td>
+                                    </tr>
+                                </template>
+                            </table>
+                        </div>
+                    </template>
+                    <vaadin-grid-column width="30px" flex-grow="0" class="rowCount">
+                        <template class="header">#</template>
+                        <template>[[item.index]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="35px" flex-grow="0" hidden="[[searchDataset]]">
+                        <template class="header">
+                            <vaadin-grid-sorter path="item.geometrytype.value">Type</vaadin-grid-sorter>
+                        </template>
+                        <template>
+                            <iron-icon icon="{{getGeoTypeIcon(item.geometrytype.value, item.physicalid.value)}}"></iron-icon>
+                        </template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column resizable hidden="[[searchDataset]]">
+                        <template class="header">
+                            <vaadin-grid-sorter path="layername">Dataset</vaadin-grid-sorter>
+                        </template>
+                        <template>[[item.properties.layername]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column resizable hidden="[[searchDataset]]">
+                        <template class="header">
+                            <vaadin-grid-sorter path="NAME.value">Geoitem (STRID)</vaadin-grid-sorter>
+                        </template>
+                        <template>[[item.properties.STRID]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column resizable hidden="[[!searchDataset]]"	>
+                        <template class="header">
+                            <vaadin-grid-sorter path="dataset_name.value">Dataset</vaadin-grid-sorter>
+                        </template>
+                        <template>[[item.dataset_name.value]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="30x" resizable hidden="[[!searchDataset]]">
+                        <template class="header">
+                            <vaadin-grid-sorter path="dataset_state.value">State</vaadin-grid-sorter>
+                        </template>
+                        <template>[[item.dataset_state.value]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="30x" resizable hidden="[[!searchDataset]]">
+                        <template class="header">
+                            <vaadin-grid-sorter path="dataset_type.value">Type</vaadin-grid-sorter>
+                        </template>
+                        <template>[[item.dataset_type.value]]</template>
+                    </vaadin-grid-column>
+                    <vaadin-grid-column width="40px" resizable hidden="[[!searchDataset]]">
+                        <template class="header">Action</template>
+                        <template>
+                            <div>
+                                <paper-icon-button title="Add to City Experience" class="addAttributeBtn" icon="icons:add-circle-outline" on-click="addDatasetLayer" data-value="[[item.dataset_uuid.value]]"></paper-icon-button>
+								<paper-icon-button title="Remove from Referential" class="addAttributeBtn" icon="icons:delete-forever" on-click="deleteDataset" data-value="[[item.dataset_uuid.value]]" hidden="[[!disableDeleteDataset]]"></paper-icon-button>
+                            </div>
+                        </template>
+                    </vaadin-grid-column>
+                </vaadin-grid>
+                <div id="pages">
+                    <button on-tap="prev" hidden="[[!pagination.displayPrevPageBtn]]">&lt;</button>
+                    <template is="dom-repeat" items="[[pagination.pages]]">
+                        <button on-tap="select" selected$="[[isSelected(pagination.page, item)]]">[[item]]</button>
+                    </template>
+                    <button on-tap="next" hidden="[[!pagination.displayNextPageBtn]]">&gt;</button>
+                </div>
+            </div>
+    </template>
+</dom-module>
+<script src="main-element.js" type="text/javascript"></script>

@@ -1,0 +1,252 @@
+<dom-module id="main-element-style">
+    <template>
+        <style>
+         :host {
+            display: block;
+            height: 100%;
+            margin: 6px;
+            overflow-y: auto;
+        }
+	
+        #loading {
+            display: flex;
+            justify-content: center;
+        }
+
+        #content {
+            height: 100%;
+            display: none;
+        }
+
+        #toolbar {
+            border: lightgray;
+            border-width: 1px;
+            border-style: none none solid none;
+            padding-bottom: 5px;
+        }
+
+        #toolbar > paper-icon-button {
+            border-radius: 4px;
+            color: gray;
+            --paper-icon-button-disabled: {
+                color: #FBFCFC!important;
+            }
+        }
+		
+		#exportOptionsList > paper-item {
+			background-color: #f9f9f9;
+			box-shadow: 0px 8px 16px 0px rgb(0 0 0 / 20%);
+		}
+		
+		#exportOptionsList > paper-item:hover {
+            background-color: #649fc4;
+        }
+		
+        paper-button {
+            background-color: #368ec4;
+            color: #fff;
+            padding: 11px 14px 11px 14px;
+            min-width: 72px;
+            text-transform: none;
+            font-size: 12px;
+        }
+
+        paper-button:hover {
+            background-color: #649fc4;
+        }
+
+        paper-icon-button {
+            color: #368ec4;
+            --paper-icon-button-hover: {
+                /*background-color: lightsteelblue;*/
+                background-color: #ECF0F1;
+                border-radius: 20px;
+            }
+        }
+
+        table {
+            width: 100%;
+        }
+
+        #resultsDatagrid {
+            height: calc(100% - 380px);
+            min-height: 150px;
+            --vaadin-grid-body-row-selected-cell: {
+                background-color: #E0F4FF;
+            };
+        }
+
+        .btnCol {
+            width: 184px;
+            vertical-align: middle;
+        }
+
+        .enabled {
+            background-color: #368ec4;
+            border-radius: 50%;
+            color: white!important;
+        }
+
+        .details {
+            padding: 20px 35px;
+            background-color: #F9FDFF;
+        }
+
+        #pages {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0px;
+            justify-content: center;
+        }
+
+        #pages>button {
+            user-select: none;
+            padding: 5px;
+            margin: 0 5px;
+            border-radius: 10%;
+            border: 0;
+            background: transparent;
+            font: inherit;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #pages>button:hover,
+        #pages>button:focus {
+            color: #368ec4;
+            background-color: #eee;
+        }
+
+        #pages>button[selected] {
+            font-weight: bold;
+            color: white;
+            background-color: #368ec4;
+        }
+
+        #searchSummary {
+            padding: 25px 2px 10px 2px;
+            visibility: hidden;
+        }
+
+        .dropdown {
+            display: none;
+            box-shadow: 0px 2px 18px 0px rgba(0,0,0,0.5);
+        }
+
+        .dropdown > td {
+            background-color: #f1f1f1;
+        }
+
+        #suggestDatagrid {
+            height: 210px;
+            --vaadin-grid-body-row-selected-cell: {
+                background-color: #E0F4FF;
+            };
+        }
+
+        iron-icon {
+            color: #368ec4;
+        }
+
+        .white {
+            color: #FFFFFF;
+        }
+
+        #searchingSpinner {
+            position: absolute;
+            left: calc(50% - 64px);
+            top: 400px;
+            display: none
+        }
+
+        #suggestionsSpinner {
+            position: absolute;
+            left: calc(50% - 64px);
+            top: 235px;
+            display: none
+        }
+
+        .alignRight {
+            float: right;
+        }
+
+        #exportBtn {
+            height: 36px;
+        }
+
+        #exportBtnContainer {
+            position: absolute;
+            right: 0px;
+            z-index: 10000;
+        }
+
+        #exportBtnRelativeContainer {
+            position: relative;
+            margin-right: 2px;
+        }
+
+        #exportSpinner, #advanceSearchOperators {
+            display: none;
+        }
+
+        .selectedTag {
+            background-color: #368ec4!important;
+            color: white!important;
+        }
+
+        .addAttributeBtn {
+            width: 30px !important;
+            height: 30px !important;
+            padding: 5px !important;
+        }
+
+        #attributeFilterInputs {
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center !important;
+        }
+
+        #attributeFilterInputs > * {
+            padding: 3px;
+            margin: 5px 10px;
+        }
+
+        .attributeOperator {
+            min-width: 0px !important;
+            padding: 11px 12px 11px 12px !important;
+        }
+
+        paper-listbox {
+            max-height: 100px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        #whereInput {
+            --paper-tag-item: {
+                word-break: break-all;
+            }
+        }
+
+        paper-tooltip {
+            --paper-tooltip-background: Gainsboro;
+            --paper-tooltip-text-color: Black;
+            --paper-tooltip: {
+                border-style: solid;
+                border-width: 1px;
+                border-color: Silver;
+                border-radius: 2px;
+            }
+        }
+
+        .divider {
+            width: 1px;
+            height: 30px;
+            background-color: gray;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        </style>
+    </template>
+</dom-module>
